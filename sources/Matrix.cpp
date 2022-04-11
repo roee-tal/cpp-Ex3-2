@@ -1,7 +1,9 @@
 #include "Matrix.hpp"
 #include <string>
+#include <iostream>
 namespace zich{
 
+//ctor using initialization list
 Matrix::Matrix(std::vector<double> data, const int row, const int col):row(row),col(col)
 {
     if (row <= 0 || col <= 0)
@@ -15,13 +17,15 @@ Matrix::Matrix(std::vector<double> data, const int row, const int col):row(row),
     this->data = std::move(data);
 }
 
-void Matrix:: is_legal(Matrix const &mat)const{
+//Check if the input is legal(row==row,col==col)
+void Matrix:: is_legal(const Matrix &mat)const{
     if(this->row != mat.row || this->col != mat.col){
         throw std::invalid_argument("row and col must be equal");
     }
 }
 
-Matrix Matrix::operator+(Matrix const &mat){
+//Insert to new mat the sum of 2 matrices
+Matrix Matrix::operator+(const Matrix &mat){
     is_legal(mat);
     Matrix mat_res{this->data,row,col};
     for (int i = 0; i < mat_res.data.size(); i++)
@@ -31,7 +35,8 @@ Matrix Matrix::operator+(Matrix const &mat){
     return mat_res;
 }
 
-Matrix& Matrix::operator+=(Matrix const &mat){
+//Insert to *this mat the sum of 2 matrices
+Matrix& Matrix::operator+=(const Matrix &mat){
     is_legal(mat);
     for (int i = 0; i < this->data.size(); i++)
     {
@@ -40,11 +45,13 @@ Matrix& Matrix::operator+=(Matrix const &mat){
     return *this;
  }
 
+//Positive Unary - return new mat. (The function is friend because the left 'char' is not the class object). 
  Matrix operator+(Matrix& mat){
      Matrix unary_mat{mat.data,mat.row,mat.col};
      return unary_mat;
  }
 
+//++mat
 Matrix& Matrix::operator++(){
      for(int i = 0; i < this->data.size(); i++)
      {
@@ -53,6 +60,7 @@ Matrix& Matrix::operator++(){
      return *this;
  }
 
+//mat++
 Matrix Matrix::operator++(const int num){
     Matrix copy = *this;
     for(int i = 0; i < this->data.size(); i++)
@@ -63,6 +71,7 @@ Matrix Matrix::operator++(const int num){
 
 }
 
+//mat--
 Matrix Matrix::operator--(const int num){
     Matrix copy = *this;
     for(int i = 0; i < this->data.size(); i++)
@@ -72,7 +81,8 @@ Matrix Matrix::operator--(const int num){
     return copy;
 }
 
-Matrix Matrix::operator-(Matrix const &mat){
+//Insert to new mat the dif of 2 matrices
+Matrix Matrix::operator-(const Matrix &mat){
     is_legal(mat);
     Matrix mat_res{this->data,row,col};
     for (int i = 0; i < mat_res.data.size(); i++)
@@ -82,6 +92,7 @@ Matrix Matrix::operator-(Matrix const &mat){
     return mat_res;
  }
 
+//Insert to this mat the dif of 2 matrices
 Matrix& Matrix::operator-=(const Matrix& mat){
     is_legal(mat);
     for (int i = 0; i < this->data.size(); i++)
@@ -91,6 +102,7 @@ Matrix& Matrix::operator-=(const Matrix& mat){
     return *this;
  }
 
+//--mat
 Matrix& Matrix::operator--(){
     for(int i = 0; i < this->data.size(); i++)
     {
@@ -99,6 +111,7 @@ Matrix& Matrix::operator--(){
     return *this;
 }
 
+//Negative Unary - return new mat. (The function is friend because the left 'char' is not the class object). 
 Matrix operator-(Matrix& mat){
     Matrix unary_neg{mat.data,mat.row,mat.col};
     for (int i = 0; i < mat.data.size(); i++)
@@ -112,6 +125,8 @@ Matrix operator-(Matrix& mat){
     return unary_neg;
 } 
 
+
+//Help function to calculate the sum of the matrix
 double Matrix::sum_mat() const{
     double sum = 0;
     for (int i = 0; i < this->data.size(); i++)
@@ -128,7 +143,8 @@ bool Matrix::operator>(const Matrix& mat)const{
 
 bool Matrix::operator>=(const Matrix& mat)const{
     is_legal(mat);
-    return this->sum_mat() >= mat.sum_mat();
+    // return this->sum_mat() >= mat.sum_mat();
+    return (*this == mat || *this > mat);
 }
 
 bool Matrix::operator<(const Matrix& mat)const{
@@ -138,7 +154,8 @@ bool Matrix::operator<(const Matrix& mat)const{
 
 bool Matrix::operator<=(const Matrix& mat)const{
     is_legal(mat);
-    return this->sum_mat() <= mat.sum_mat();
+    // return this->sum_mat() <= mat.sum_mat();
+    return (*this == mat || *this < mat);
 }
 
 bool Matrix::operator!=(const Matrix& mat)const{
@@ -146,10 +163,9 @@ bool Matrix::operator!=(const Matrix& mat)const{
     return this->sum_mat() != mat.sum_mat();
 }
 
+//mat1==mat2 if each value is equal in the right place
 bool Matrix:: operator==(const Matrix& mat)const{
     is_legal(mat);
-    double sum1 = 0;
-    double sum2 = 0;
     for (int i = 0; i < this->data.size(); i++){
         if(this->data[size_t(i)] != mat.data[size_t(i)])
         {
@@ -159,6 +175,7 @@ bool Matrix:: operator==(const Matrix& mat)const{
     return true;
 }
 
+//Multiply each value with the scalar and insert to new mat
 Matrix Matrix::operator*(const double scalar){
     Matrix mat_res{this->data,this->row,this->col};
     for (int i = 0; i < mat_res.data.size(); i++)
@@ -168,6 +185,7 @@ Matrix Matrix::operator*(const double scalar){
     return mat_res;
  }
 
+//Multiply each value with the scalar and insert to this mat
 Matrix& Matrix::operator*=(const double scalar){
     for (int i = 0; i < this->data.size(); i++){
         this->data[size_t(i)] = this->data[size_t(i)]*scalar; 
@@ -176,6 +194,8 @@ Matrix& Matrix::operator*=(const double scalar){
 
 }
 
+//Multiply each value with the scalar and insert to this mat
+//Friend func - for example: new_mat = 9*mat
 Matrix operator*(const double scalar, Matrix &mat){
     Matrix mat_res{mat.data,mat.row,mat.col};
     for (int i = 0; i < mat_res.data.size(); i++)
@@ -185,10 +205,14 @@ Matrix operator*(const double scalar, Matrix &mat){
     return mat_res;
 }
 
+//Multiply matrices
 Matrix Matrix::operator*(const Matrix &mat){
     if(this->col != mat.row){
         throw std::runtime_error("left matrix's col has to be same to right matrix row");
     }
+    int idx=0;
+    int ind_this=0;
+    int ind_mat=0;
     std::vector<double> vector1;
     vector1.resize((unsigned int)(this->row * mat.col));
     for (int i = 0; i < this->row; i++)
@@ -197,19 +221,24 @@ Matrix Matrix::operator*(const Matrix &mat){
         {
             for (int k = 0; k < this->col; k++)
             {
-                int idx = mat.col*i+j;
-                vector1[size_t(idx)] += this->data[size_t(this->col*i+k)]*mat.data[size_t(mat.col*k+j)];
+                idx = mat.col*i+j;
+                ind_this = this->col*i+k;
+                ind_mat = mat.col*k+j;
+                vector1[size_t(idx)] += this->data[size_t(ind_this)]*mat.data[size_t(ind_mat)];
             }
         }
     }
-    Matrix mat3(vector1, this->row, mat.col);
-    return mat3;
+    Matrix mat_res(vector1, this->row, mat.col);
+    return mat_res;
 }
 
 Matrix& Matrix::operator*=(const Matrix &mat){
     if(this->col != mat.row){
         throw std::runtime_error("left matrix's col has to be same to right matrix row");
     }
+    int idx=0;
+    int ind_this=0;
+    int ind_mat=0;
     std::vector<double> vector1;
     vector1.resize((unsigned int)(this->row * mat.col));
     for (int i = 0; i < this->row; i++)
@@ -218,7 +247,10 @@ Matrix& Matrix::operator*=(const Matrix &mat){
         {
             for (int k = 0; k < this->col; k++)
             {
-                vector1[size_t(mat.col*i+j)] += this->data[size_t(this->col*i+k)]*mat.data[size_t(mat.col*k+j)];
+                idx = mat.col*i+j;
+                ind_this = this->col*i+k;
+                ind_mat = mat.col*k+j;
+                vector1[size_t(idx)] += this->data[size_t(ind_this)]*mat.data[size_t(ind_mat)];
             }
         }
     }
@@ -228,7 +260,8 @@ Matrix& Matrix::operator*=(const Matrix &mat){
 }
 
 std::ostream& operator << (std::ostream &out, const Matrix &mat){
-    for (int i = 0; i < mat.row; i++){
+    for (int i = 0; i < mat.row; i++)
+    {
         out << '[';
         for (int j = 0; j < mat.col; j++)
         {
@@ -240,86 +273,20 @@ std::ostream& operator << (std::ostream &out, const Matrix &mat){
                 out <<mat.data[(unsigned int)(i * mat.col + j)];
             }
         }
-        out << ']' << '\n';
+        if (i != mat.row - 1)
+            {
+                out << ']' << '\n';
+            }
+        else
+            {
+                out << ']';
+            }
     }
     return out;
 }
-
-// std::istream& operator>> (std::istream &os ,Matrix& mat);
-// std::istream & operator >> (std::istream & is, Matrix & self){
-//         string element;
-//         string matend;
-//         int columns = -2;
-//         int lines = 0;
-//         std::vector<double> matrix;
-//         while(!is.eof()){
-//             is >> element;
-//             matend+=" "+element;
-//         }
-
-//         lines = (int)count(matend.begin(), matend.end(), '[');
-
-//         for(unsigned long i=0; i < matend.size(); i++){
-//             if(matend[i] == ' '){
-//                 columns++;
-//             }
-//             if(matend[i] == ']'){
-//                 break;
-//             }
-//         }
-
-//         // matrix_input_exeption(&matend,lines,columns);
-
-//         int sum_spaces = lines*(columns+2);
-//         int sum_psiks = lines-1;
-//         if(lines != (int)count(matend.begin(), matend.end(), ']')){
-//             throw std::out_of_range{"not in format"};
-//         }
-//         int sum_spaces_between = 0;
-//         for(unsigned long i=0; i < matend.size(); i++){
-//             if(matend[i] == ' '){
-//                 sum_spaces--;
-//                 sum_spaces_between++;
-//             }
-//             if(matend[i] == ','){
-//                 sum_psiks--;
-//             }
-//             if(i != matend.size()-1 && matend[i] == ']' && matend[i+1] != ','){
-//                 throw std::out_of_range{"not in format"};
-//             }
-//             if(matend[i] == ']'){
-//                 if(sum_spaces_between != (columns+2)){
-//                     throw std::out_of_range{"not in format"};
-//                 }
-//                 sum_spaces_between = 0;
-//             }  
-//         }
-//         if(sum_spaces != 0 || sum_psiks !=0){
-//             throw std::out_of_range{"not in format"};
-//         }
-
-//         replace(matend.begin(),matend.end(),'[', ' ');
-//         replace(matend.begin(),matend.end(),']', ' ');
-//         replace(matend.begin(),matend.end(),',', ' ');
-
-//         string num_in_matrix;
-//         stringstream stream_matrix(matend);
-//         while (getline(stream_matrix, num_in_matrix,' ')) {
-//             if( num_in_matrix != "\0"){
-//                 try{
-//                     double num_double =stod(num_in_matrix);
-//                     matrix.push_back(num_double);
-//                 }
-//                 catch (exception& ex) {
-//                     throw std::out_of_range{"not number"};
-//                 }
-//             }
-//         }
-//         self.columns = columns;
-//         self.lines = lines;
-//         self.matrix = matrix;
-//         return is;
-//     }   
+std::istream & operator>> (std::istream &input , Matrix& m){
+    return input;
+}
 
 
 }

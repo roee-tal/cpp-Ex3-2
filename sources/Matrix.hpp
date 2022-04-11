@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <sstream>
 
 namespace zich{
     class Matrix{    
@@ -9,8 +10,7 @@ namespace zich{
             int row;
             int col;
 
-        public:
-
+        public :
             //constructor
             Matrix(const std::vector<double> data, const int row, const int col); 
 
@@ -18,7 +18,7 @@ namespace zich{
             void is_legal(const Matrix &mat) const;
 
             //Arithmetic operators
-            Matrix operator+(Matrix const &mat);
+            Matrix operator+(const Matrix &mat);
             Matrix& operator+=(const Matrix& mat);   
             Matrix& operator++();
             Matrix operator++(const int num);
@@ -51,7 +51,6 @@ namespace zich{
 
             // input output
             friend std::ostream & operator << (std::ostream &out, const Matrix &mat);
-            // friend std::istream& operator>> (std::istream &os ,Matrix& mat);
-            friend std::istream & operator >> (std::istream & is, Matrix & self);
+            friend std::istream & operator>> (std::istream &input , Matrix& m);
     };
 }
