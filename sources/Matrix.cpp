@@ -6,11 +6,11 @@ namespace zich{
 //ctor using initialization list
 Matrix::Matrix(std::vector<double> data, const int row, const int col):row(row),col(col)
 {
-    if (row <= 0 || col <= 0)
+    if (row <= 0 || col <= 0) //cant be negative
     {
         throw std::runtime_error("row or col can't be negative");
     }
-    if(row * col != data.size())
+    if(row * col != data.size()) // the size should be match to number of values
     {
          throw std::runtime_error("row*col should be same to the matrix size");
     }
@@ -28,9 +28,9 @@ void Matrix:: is_legal(const Matrix &mat)const{
 Matrix Matrix::operator+(const Matrix &mat){
     is_legal(mat);
     Matrix mat_res{this->data,row,col};
-    for (int i = 0; i < mat_res.data.size(); i++)
+    for (unsigned long i = 0; i < mat_res.data.size(); i++)
     {
-        mat_res.data[size_t(i)] = this->data[size_t(i)] + mat.data[size_t(i)];
+        mat_res.data.at(i) = this->data.at(i) + mat.data.at(i);
     }
     return mat_res;
 }
@@ -38,9 +38,9 @@ Matrix Matrix::operator+(const Matrix &mat){
 //Insert to *this mat the sum of 2 matrices
 Matrix& Matrix::operator+=(const Matrix &mat){
     is_legal(mat);
-    for (int i = 0; i < this->data.size(); i++)
+    for (unsigned long i = 0; i < this->data.size(); i++)
     {
-        this->data[size_t(i)] += mat.data[size_t(i)];
+        this->data.at(i) += mat.data.at(i);
     }
     return *this;
  }
@@ -53,9 +53,9 @@ Matrix& Matrix::operator+=(const Matrix &mat){
 
 //++mat
 Matrix& Matrix::operator++(){
-     for(int i = 0; i < this->data.size(); i++)
+     for(unsigned long i = 0; i < this->data.size(); i++)
      {
-         this->data[size_t(i)] += 1;
+         this->data.at(i) += 1;
      }
      return *this;
  }
@@ -63,9 +63,9 @@ Matrix& Matrix::operator++(){
 //mat++
 Matrix Matrix::operator++(const int num){
     Matrix copy = *this;
-    for(int i = 0; i < this->data.size(); i++)
+    for(unsigned long i = 0; i < this->data.size(); i++)
      {
-         this->data[size_t(i)] += 1;
+         this->data.at(i)+= 1;
      }
      return copy;
 
@@ -74,9 +74,9 @@ Matrix Matrix::operator++(const int num){
 //mat--
 Matrix Matrix::operator--(const int num){
     Matrix copy = *this;
-    for(int i = 0; i < this->data.size(); i++)
+    for(unsigned long i = 0; i < this->data.size(); i++)
     {
-         this->data[size_t(i)] -= 1;
+         this->data.at(i) -= 1;
     }
     return copy;
 }
@@ -85,9 +85,9 @@ Matrix Matrix::operator--(const int num){
 Matrix Matrix::operator-(const Matrix &mat){
     is_legal(mat);
     Matrix mat_res{this->data,row,col};
-    for (int i = 0; i < mat_res.data.size(); i++)
+    for (unsigned long i = 0; i < mat_res.data.size(); i++)
     {
-        mat_res.data[size_t(i)] = this->data[size_t(i)] - mat.data[size_t(i)];
+        mat_res.data.at(i) = this->data.at(i)- mat.data.at(i);
     }
     return mat_res;
  }
@@ -95,18 +95,18 @@ Matrix Matrix::operator-(const Matrix &mat){
 //Insert to this mat the dif of 2 matrices
 Matrix& Matrix::operator-=(const Matrix& mat){
     is_legal(mat);
-    for (int i = 0; i < this->data.size(); i++)
+    for (unsigned long i = 0; i < this->data.size(); i++)
     {
-        this->data[size_t(i)] -= mat.data[size_t(i)];
+        this->data.at(i) -= mat.data.at(i);
     }
     return *this;
  }
 
 //--mat
 Matrix& Matrix::operator--(){
-    for(int i = 0; i < this->data.size(); i++)
+    for(unsigned long i = 0; i < this->data.size(); i++)
     {
-         this->data[size_t(i)] -= 1;
+         this->data.at(i) -= 1;
     }
     return *this;
 }
@@ -114,12 +114,12 @@ Matrix& Matrix::operator--(){
 //Negative Unary - return new mat. (The function is friend because the left 'char' is not the class object). 
 Matrix operator-(Matrix& mat){
     Matrix unary_neg{mat.data,mat.row,mat.col};
-    for (int i = 0; i < mat.data.size(); i++)
+    for (unsigned long i = 0; i < mat.data.size(); i++)
     {   
-        if(mat.data[size_t(i)] == 0){
+        if(mat.data.at(i) == 0){
             continue;
         }
-        unary_neg.data[size_t(i)] = (-1)*(mat.data[size_t(i)]);
+        unary_neg.data.at(i) = (-1)*(mat.data.at(i));
         
     }
     return unary_neg;
@@ -129,9 +129,9 @@ Matrix operator-(Matrix& mat){
 //Help function to calculate the sum of the matrix
 double Matrix::sum_mat() const{
     double sum = 0;
-    for (int i = 0; i < this->data.size(); i++)
+    for (unsigned long i = 0; i < this->data.size(); i++)
     {
-        sum += this->data[size_t(i)];
+        sum += this->data.at(i);
     }
     return sum;
 }
@@ -143,7 +143,6 @@ bool Matrix::operator>(const Matrix& mat)const{
 
 bool Matrix::operator>=(const Matrix& mat)const{
     is_legal(mat);
-    // return this->sum_mat() >= mat.sum_mat();
     return (*this == mat || *this > mat);
 }
 
@@ -154,20 +153,20 @@ bool Matrix::operator<(const Matrix& mat)const{
 
 bool Matrix::operator<=(const Matrix& mat)const{
     is_legal(mat);
-    // return this->sum_mat() <= mat.sum_mat();
     return (*this == mat || *this < mat);
 }
 
+//Use of !(==)
 bool Matrix::operator!=(const Matrix& mat)const{
     is_legal(mat);
-    return this->sum_mat() != mat.sum_mat();
+    return !(*this == mat);
 }
 
 //mat1==mat2 if each value is equal in the right place
 bool Matrix:: operator==(const Matrix& mat)const{
     is_legal(mat);
-    for (int i = 0; i < this->data.size(); i++){
-        if(this->data[size_t(i)] != mat.data[size_t(i)])
+    for (unsigned long i = 0; i < this->data.size(); i++){
+        if(this->data.at(i) != mat.data.at(i))
         {
             return false;
         }
@@ -178,17 +177,17 @@ bool Matrix:: operator==(const Matrix& mat)const{
 //Multiply each value with the scalar and insert to new mat
 Matrix Matrix::operator*(const double scalar){
     Matrix mat_res{this->data,this->row,this->col};
-    for (int i = 0; i < mat_res.data.size(); i++)
+    for (unsigned long i = 0; i < mat_res.data.size(); i++)
     {
-        mat_res.data[size_t(i)] = this->data[size_t(i)] * scalar;
+        mat_res.data.at(i) = this->data.at(i) * scalar;
     }
     return mat_res;
  }
 
 //Multiply each value with the scalar and insert to this mat
 Matrix& Matrix::operator*=(const double scalar){
-    for (int i = 0; i < this->data.size(); i++){
-        this->data[size_t(i)] = this->data[size_t(i)]*scalar; 
+    for (unsigned long i = 0; i < this->data.size(); i++){
+        this->data.at(i) = this->data.at(i)*scalar; 
     }
     return *this;
 
@@ -198,14 +197,14 @@ Matrix& Matrix::operator*=(const double scalar){
 //Friend func - for example: new_mat = 9*mat
 Matrix operator*(const double scalar, Matrix &mat){
     Matrix mat_res{mat.data,mat.row,mat.col};
-    for (int i = 0; i < mat_res.data.size(); i++)
+    for (unsigned long i = 0; i < mat_res.data.size(); i++)
     {
-        mat_res.data[size_t(i)] = mat.data[size_t(i)] * scalar;
+        mat_res.data.at(i) = mat.data.at(i) * scalar;
     }
     return mat_res;
 }
 
-//Multiply matrices
+//Multiply matrices into new mat
 Matrix Matrix::operator*(const Matrix &mat){
     if(this->col != mat.row){
         throw std::runtime_error("left matrix's col has to be same to right matrix row");
@@ -232,6 +231,7 @@ Matrix Matrix::operator*(const Matrix &mat){
     return mat_res;
 }
 
+//Multiply matrices into *this mat
 Matrix& Matrix::operator*=(const Matrix &mat){
     if(this->col != mat.row){
         throw std::runtime_error("left matrix's col has to be same to right matrix row");
@@ -259,6 +259,9 @@ Matrix& Matrix::operator*=(const Matrix &mat){
     return *this;
 }
 
+//Should print: [6 0 0]
+//              [0 6 0]
+//              [0 0 6]*/
 std::ostream& operator << (std::ostream &out, const Matrix &mat){
     for (int i = 0; i < mat.row; i++)
     {
@@ -284,9 +287,75 @@ std::ostream& operator << (std::ostream &out, const Matrix &mat){
     }
     return out;
 }
-std::istream & operator>> (std::istream &input , Matrix& m){
+
+
+// Should be in this format :[1 1], [1 1]
+std::istream& operator >>(std::istream& input,Matrix &mat){
+    std::vector<double> vector1;
+    int row=1;
+    int col = 1;
+    int col_size = 1;
+    int row_size=mat.data.size();
+    bool first = false;
+    std::string str;
+    for(char tmp=0; input.get(tmp) && tmp!='\n';){
+        if(tmp==','){
+            row++;
+            if((first && col!=col_size) || row >= row_size){
+                throw std::invalid_argument("wrong col\row num for mat");
+            }
+            if(!first) {
+                col = col_size;
+                first= true;
+                col_size=0;
+            }   
+        }
+        else if(tmp==' '){
+            vector1.push_back(stod(str));
+            str="";
+            col_size++;
+        }
+        else if(tmp != '[' && tmp != ']') {
+                str += tmp;
+        }
+    }
+    mat.data = vector1;
     return input;
 }
-
-
 }
+
+
+
+    // string str;
+    // double num=0;
+    // input.fill('f');
+    // int rowSize=matrix.mat.size();
+    // int columnSize=matrix.mat.at(0).size ();
+    // unsigned long row=0;
+    // unsigned long column=0;
+    // input.get();
+    // for(char c=0; input.get(c)&&c!='\n';){
+    //     if (c=='['){
+    //         column=0;
+    //         row++;
+    //         if (row>=rowSize){
+    //             throw invalid_argument( "\nthe input have more rows than the matrix" );
+    //         }
+    //     }
+    //     else if((c==' '|| c==']')&&str.length()!=0){
+    //         if (column>=columnSize){
+    //             throw invalid_argument( "\nthe input have more columns than the matrix" );
+    //         }
+    //         num= stod(str);
+    //         matrix.mat.at(row).at(column)=num;
+    //         cout<<row<<","<<column<<","<<num <<endl;
+    //         column++;
+    //         str="";
+    //     }
+    //     else if (isdigit(c)!=0){
+
+    //         str+=c;
+    //     }
+    // }
+
+    // return input;

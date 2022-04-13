@@ -51,6 +51,6 @@ namespace zich{
 
             // input output
             friend std::ostream & operator << (std::ostream &out, const Matrix &mat);
-            friend std::istream & operator>> (std::istream &input , Matrix& m);
+            friend std::istream & operator>> (std::istream &input , Matrix& mat);
     };
 }
